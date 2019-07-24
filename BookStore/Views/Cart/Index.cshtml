@@ -1,0 +1,60 @@
+﻿@model IEnumerable<BookStore.Models.Book>
+@{
+    ViewData["Title"] = "Index";
+    var counter = 1;
+    double total = 0;
+}
+
+<br />
+<h3 class="text-primary">Shoppint Cart</h3>
+<br />
+
+@if (Model.Any())
+{
+    <table class="table table-striped table-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Serial No</th>
+                <th>Product</th>
+                <th>Details</th>
+                <th>Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in Model)
+            {
+                <tr>
+                    <td>@counter</td>
+                    <td>
+                        <a asp-controller="Book" asp-action="Details" asp-route-id="@book.BookId"><h5>@book.Title</h5></a>
+                        <span class="small">Category: @book.Category.CategoryName</span>
+                    </td>
+                    <td>Author: <a asp-controller="Author" asp-action="Details" asp-route-id="@book.Author.AuthorId">@book.Author.Name</a></td>
+                    <td> &#2547; @book.Price</td>
+                    <td><a asp-action="Remove" asp-route-id="@book.BookId" class="btn btn-danger float-right"><i class="fa fa-trash-alt"></i></a></td>
+                </tr>
+                counter++;
+                total += book.Price;
+            }
+        <tr class="bg-dark text-white">
+            <td></td>
+            <td></td>
+            <td>Total</td>
+            <td colspan="2"> &#2547; @total</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <br />
+
+    <a asp-action="Order" class="btn btn-success">Proceed To Order</a>
+    
+}
+else
+{
+    <h4 class="text-warning bg-dark p-4 rounded">The Cart is Empty!!!</h4>
+    <br />
+    <a class="btn btn-success" asp-controller="Book" asp-action="Index">View Available Books</a>
+}

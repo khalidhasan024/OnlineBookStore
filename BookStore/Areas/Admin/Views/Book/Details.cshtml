@@ -1,0 +1,75 @@
+﻿@model BookStore.Models.Book
+@{
+    ViewData["Title"] = "Details";
+}
+
+<br />
+
+<div class="row">
+    <div class="col-6">
+        <h2 class="text-info ">Book Details</h2>
+    </div>
+</div>
+
+<div class="row p-4 border rounded">
+    <div class="col-7">
+        <div class="row form-group">
+            <div class="col-3">
+                <label asp-for="Title"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="Title" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-3">
+                <label asp-for="Author"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="Author.Name" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-3">
+                <label asp-for="Category"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="Category.CategoryName" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-3">
+                <label asp-for="Price"></label>
+            </div>
+            <div class="col-9">
+                <input asp-for="Price" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-3">
+                <label asp-for="Discount"></label>
+            </div>
+            <div class="col-9">
+                <input type="text" asp-for="Discount" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-3">
+                <label asp-for="Stock"></label>
+            </div>
+            <div class="col-9">
+                <input type="text" asp-for="Stock" readonly class="form-control" />
+            </div>
+        </div>
+    </div>
+    <div class="col-1"></div>
+    <div class="col-4">
+        <img class="border rounded overflow-hidden" src="@Model.ImagePath" title="@Model.Title" alt="@Model.Title" />
+    </div>
+    <br />
+    <div class="form-group">
+        <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-sm btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-sm btn-success">Back to List</a>
+    </div>
+</div>
+

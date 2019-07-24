@@ -1,0 +1,36 @@
+﻿@model BookStore.Models.ViewModels.OrderIndexViewModel
+@{
+    ViewData["Title"] = Model.Title ;
+}
+
+<br />
+
+<div class="row">
+    <div class="col">
+        <h2 class="text-info ">@Model.Title</h2>
+    </div>
+</div>
+
+<div>
+    <table class="table table-sm table-striped border">
+        <tr class="table-info">
+            <th>Order Date</th>
+            <th>Orderer's Name</th>
+            <th>Delivery Address</th>
+            <th></th>
+        </tr>
+        @foreach( var order in Model.Orders)
+        {
+            <tr>
+                <td>@Html.DisplayFor(m => order.Date)</td>
+                <td>@Html.DisplayFor(m => order.Name)</td>
+                <td>@Html.DisplayFor(m => order.Address)</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-success float-right" >
+                        View Details
+                    </a>
+                </td>
+            </tr>
+        }
+    </table>
+</div>

@@ -1,0 +1,69 @@
+﻿@model  IEnumerable<BookStore.Models.Book>
+@{
+    ViewData["Title"] = "Home";
+    var BestSeller = Model.OrderByDescending(b => b.Price).Take(4).ToList();
+    var HighestRated = Model.OrderBy(b => b.Price).Take(4).ToList();
+}
+
+<br />
+<h1 class="text-primary font-weight-bold font-italic">
+    <a asp-controller="Home" asp-action="Index">
+        <u>B<span class="small">OOK</span>S<span class="small">TORE</span></u>
+    </a>
+</h1>
+<br />
+<div class="jumbotron">
+    <h3>Best Sellers</h3>
+    <br />
+    <div class="row">
+        @foreach (var Book in BestSeller)
+        {
+            <div class="col-3 card">
+                <div class="card-header">
+                    <h5>@Book.Title</h5>
+                </div>
+                <img class="card-img-top" src="@Book.ImagePath" title="@Book.Title" alt="@Book.Title" />
+                <div class="card-body">
+                    <div class="mb-2">
+                        <span class="lead font-weight-bold"> &#2547; @Book.Price</span>
+                        <a asp-controller="Book" asp-action="Details" asp-route-id="@Book.BookId" class="btn btn-sm btn-success float-right">View Details</a>
+                    </div>
+                    <div>
+                        Category:&nbsp;&nbsp; <a asp-controller="Category" asp-action="Details" asp-route-id="@Book.Category.Id">@(Book.Category?.CategoryName)</a>
+                    </div>
+                    <div>
+                        By:&nbsp; <a asp-controller="Author" asp-action="Details" asp-route-id="@Book.Author.AuthorId">@(Book.Author?.Name)</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="jumbotron">
+    <h3>Highest Rated</h3>
+    <br />
+    <div class="row">
+        @foreach(var Book in HighestRated)
+        {
+            <div class="col-3 card">
+                <div class="card-header">
+                    <h5>@Book.Title</h5>
+                </div>
+                <img class="card-img-top" src="@Book.ImagePath" title="@Book.Title" alt="@Book.Title" />
+                <div class="card-body">
+                    <div class="mb-2">
+                        <span class="lead font-weight-bold"> &#2547; @Book.Price</span>
+                        <a asp-controller="Book" asp-action="Details" asp-route-id="@Book.BookId" class="btn btn-sm btn-success float-right">View Details</a>
+                    </div>
+                    <div>
+                        Category:&nbsp;&nbsp; <a asp-action="Category" asp-route-id="@Book.Category.Id">@(Book.Category?.CategoryName)</a>
+                    </div>
+                    <div>
+                        By:&nbsp; <a asp-action="Author" asp-route-id="@Book.Author.AuthorId">@(Book.Author?.Name)</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

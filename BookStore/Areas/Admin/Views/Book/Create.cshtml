@@ -1,0 +1,95 @@
+﻿@model BookStore.Models.ViewModels.BookViewModel
+@{
+    ViewData["Title"] = "Create";
+}
+
+<br />
+
+<div class="row">
+    <div class="col-6">
+        <h2 class="text-info ">Add New Book</h2>
+    </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" asp-action="Create">
+    <div class="p-4 border rounded">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Book.Title"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Book.Title" class="form-control" />
+            </div>
+            <span asp-validation-for="Book.Title" class="text-danger"></span>
+        </div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Book.Author"></label>
+            </div>
+            <div class="col-5">
+                <select asp-for="Book.AuthorId" asp-items="@(new SelectList(Model.Authors, "AuthorId", "Name"))" class="form-control">
+                    <option hidden value="">Please select one</option>
+                </select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Book.Category"></label>
+            </div>
+            <div class="col-5">
+                <select asp-for="Book.CategoryId" asp-items="@(new SelectList(Model.BookCategories, "Id", "CategoryName"))" class="form-control">
+                    <option hidden value="">Please select one</option>
+                </select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Book.Price"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Book.Price" class="form-control" />
+            </div>
+            <span asp-validation-for="Book.Price" class="text-danger"></span>
+        </div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Book.Discount"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Book.Discount" class="form-control" />
+            </div>
+            <span asp-validation-for="Book.Discount" class="text-danger"></span>
+        </div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Book.ImagePath"></label>
+            </div>
+            <div class="col-5">
+                <input type="file" name="file" class="form-control-file" />
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Book.Stock"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Book.Stock" class="form-control" />
+            </div>
+            <span asp-validation-for="Book.Stock" class="text-danger"></span>
+        </div>
+
+        <br />
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-sm btn-primary" />
+            <a asp-action="Index" class="btn btn-sm btn-success">Back to List</a>
+        </div>
+    </div>
+</form>
+
+
+@section scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+

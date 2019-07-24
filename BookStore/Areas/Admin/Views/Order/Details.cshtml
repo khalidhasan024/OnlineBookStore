@@ -1,0 +1,97 @@
+﻿@model BookStore.Models.ViewModels.OrderViewModel
+@{
+    ViewData["Title"] = "Details";
+    var counter = 1;
+    double total = 0;
+}
+
+
+<br />
+<h3 class="text-primary">Order Details</h3>
+<br />
+
+
+<div class="p-4 border rounded">
+    <div class="row form-group">
+        <div class="col-2">
+            <label asp-for="Order.Date"></label>
+        </div>
+        <div class="col-5">
+            <input type="text" asp-for="Order.Date" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-2">
+            <label asp-for="Order.Name"></label>
+        </div>
+        <div class="col-5">
+            <input asp-for="Order.Name" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-2">
+            <label asp-for="Order.Phone"></label>
+        </div>
+        <div class="col-5">
+            <input asp-for="Order.Phone" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-2">
+            <label asp-for="Order.Address"></label>
+        </div>
+        <div class="col-5">
+            <textarea asp-for="Order.Address" readonly class="form-control"></textarea>
+        </div>
+    </div>
+    @if (!Model.Order.IsDelivered)
+    {
+        <br />
+        <div class="form-group">
+            <div class="col-2"></div>
+            <div class="col-5">
+                <a asp-action="Deliver" asp-route-id="@Model.Order.Id" class="btn btn-success">Deliver Order</a>
+            </div>
+        </div>
+    }
+
+</div>
+<br />
+<div class="row">
+    <div class="col">
+        <h4>Items ordered</h4>
+        <table class="table table-striped table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Serial No</th>
+                    <th>Product</th>
+                    <th>Details</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bookOrder in Model.BookOrders)
+                {
+                    <tr>
+                        <td>@counter</td>
+                        <td>
+                            <h5>@bookOrder.Book.Title</h5>
+                        </td>
+                        <td>Author: @bookOrder.Book.Author.Name</td>
+                        <td> &#2547; @bookOrder.Book.Price</td>
+                    </tr>
+                    counter++;
+                    total += bookOrder.Book.Price;
+                }
+                <tr class="bg-dark text-white">
+                    <td></td>
+                    <td></td>
+                    <td>Total</td>
+                    <td colspan="2"> &#2547; @total</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

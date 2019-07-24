@@ -1,0 +1,37 @@
+﻿@model IEnumerable<BookStore.Models.Author>
+@{
+    ViewData["Title"] = "Authors";
+}
+
+<br />
+<h3 class="text-primary">Author : All</h3>
+<br />
+
+@foreach (Author Author in Model)
+{
+    <div class="jumbotron">
+        <h3><a asp-controller="Author" asp-action="Details" asp-route-id="@Author.AuthorId">@Author.Name</a></h3>
+        <br />
+        <div class="row">
+            @foreach (var Book in Author.Books)
+            {
+                <div class="col-3 card mb-2">
+                    <div class="card-header">
+                        <h5>@Book.Title</h5>
+                    </div>
+                    <img class="card-img-top" src="@Book.ImagePath" title="@Book.Title" alt="@Book.Title" />
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="lead font-weight-bold"> &#2547; @Book.Price</span>
+                            <a asp-controller="Book" asp-action="Details" asp-route-id="@Book.BookId" class="btn btn-sm btn-success float-right">View Details</a>
+                        </div>
+                        <div>
+                            Category:&nbsp;&nbsp; <a asp-controller="Category" asp-action="Details" asp-route-id="@Book.Category.Id">@(Book.Category?.CategoryName)</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+

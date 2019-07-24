@@ -1,0 +1,54 @@
+﻿@model BookStore.Models.ViewModels.NewOrderViewModel
+@{
+    ViewData["Title"] = "Create";
+}
+
+<br />
+<h3 class="text-primary">Place an Order</h3>
+<br />
+
+
+<form method="post" asp-action="Order">
+    <div class="p-4 border rounded">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Name"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Name" class="form-control" />
+            </div>
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Phone"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Phone" class="form-control" />
+            </div>
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+        <div class="row form-group">
+            <div class="col-2">
+                <label asp-for="Address"></label>
+            </div>
+            <div class="col-5">
+                <textarea asp-for="Address" class="form-control"></textarea>
+            </div>
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+        <br />
+        <div class="form-group">
+            <input type="submit" value="Place The Order" class="btn btn-success" />
+            <a asp-action="Index" class="btn btn-primary">Back to Cart</a>
+        </div>
+    </div>
+</form>
+
+
+@section scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+

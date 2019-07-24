@@ -1,0 +1,73 @@
+﻿@model IEnumerable<BookStore.Models.Book>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<br />
+
+<div class="row">
+    <div class="col-6">
+        <h2 class="text-info ">Book List</h2>
+    </div>
+    <div class="col-6 text-right">
+        <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> New Book </a>
+    </div>
+</div>
+
+<div>
+    <table class="table table-sm table-striped border">
+        <tr class="table-info">
+            <th>
+                @Html.DisplayNameFor(b => b.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(b => b.Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(b => b.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(b => b.Stock)
+            </th>
+            <th>
+                @Html.DisplayNameFor(b => b.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(b => b.Discount)
+            </th>
+            <th></th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.BookId">
+                        @Html.DisplayFor(m => item.Title)
+                    </a>
+                </td>
+                <td>
+                    <a asp-action="Details" asp-controller="Author" asp-route-id="@item.Author.AuthorId">
+                        @Html.DisplayFor(m => item.Author.Name)
+                    </a>
+                </td>
+                <td>
+                    <a asp-action="Details" asp-controller="BookCategory" asp-route-id="@item.Category?.Id">
+                        @Html.DisplayFor(m => item.Category.CategoryName)
+                    </a>
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.Stock)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.Discount)
+                </td>
+
+                <partial name="_TableButtonPartial" model="item.BookId" />
+            </tr>
+        }
+    </table>
+</div>
+

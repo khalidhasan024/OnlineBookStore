@@ -1,0 +1,80 @@
+﻿@model BookStore.Models.Book
+
+@using Microsoft.AspNetCore.Http
+@using BookStore.Extensions
+@inject IHttpContextAccessor httpContextAccessor
+
+@{
+    ViewData["Title"] = "Book";
+}
+
+<br />
+<h3 class="text-primary">Book: @Model.Title</h3>
+<br />
+
+<div class="row jumbotron">
+    <div class="col-7">
+        <table class="table table-sm">
+            <tr>
+                <td><label asp-for="Price"></label></td>
+                <td><span class="lead font-weight-bold"> &#2547; @Model.Price</span></td>
+            </tr>
+            <tr>
+                <td><label asp-for="Author"></label></td>
+                <td><a asp-controller="Author" asp-action="Details" asp-route-id="@Model.Author.AuthorId">@Model.Author.Name</a></td>
+            </tr>
+            <tr>
+                <td><label asp-for="Category"></label></td>
+                <td><a asp-controller="Category" asp-action="Details" asp-route-id="@Model.Category.Id">@Model.Category.CategoryName</a></td>
+            </tr>
+            <tr>
+                <td><label>Contents</label></td>
+                <td><a href="#contents">Table of Contents</a></td>
+            </tr>
+            <tr class="mt-2">
+                <td></td>
+                <td>
+                    @{
+                        List<int> CartItems = httpContextAccessor.HttpContext.Session.Get<List<int>>("Cart");
+                        bool isInCart = false;
+                        if (CartItems != null && CartItems.Contains(Model.BookId))
+                        {
+                            isInCart = true;
+                        }
+                    }
+                    <form method="post">
+                        <input name="id" type="hidden" value="@Model.BookId" />
+
+                        @if (isInCart)
+                        {
+                            <input type="submit" asp-action="Remove" value="Remove From Cart" class="btn btn-block btn-danger" />
+                        }
+                        else
+                        {
+                            <input type="submit" value="Add to Cart" class="btn btn-block btn-success" />
+                        }
+                    </form>
+                </td>
+                
+            </tr>
+        </table>
+    </div>
+    <div class="col-1"></div>
+    <div class="col-4">
+        <img src="@Model.ImagePath" />
+    </div>
+</div>
+
+<div class="row jumbotron" id="contents">
+    <div class="col">
+        <div><p>Table of Contents</p></div>
+        <div><p>Table of Contents</p></div>
+        <div><p>Table of Contents</p></div>
+        <div><p>Table of Contents</p></div>
+        <div><p>Table of Contents</p></div>
+        <div><p>Table of Contents</p></div>
+        <div><p>Table of Contents</p></div>
+        <div><p>Table of Contents</p></div>
+        <div><p>Table of Contents</p></div>
+    </div>
+</div>
