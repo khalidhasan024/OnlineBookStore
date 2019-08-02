@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Data;
 using BookStore.Models;
+using BookStore.Models.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,13 +15,16 @@ namespace BookStore.Areas.Admin.Controllers
     public class AuthorController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public AuthorController(ApplicationDbContext db)
+        private readonly IBookRepository _repository;
+
+        public AuthorController(ApplicationDbContext db, IBookRepository repository)
         {
             _db = db;
+            _repository = repository;
         }
         public IActionResult Index()
         {
-            return View(_db.Authors.ToList());
+            return View(_repository.GetAllAuthors());
         }
         public IActionResult Create()
         {
@@ -32,77 +36,66 @@ namespace BookStore.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Authors.Add(author);
-                await _db.SaveChangesAsync();
+                _repository.AddAuthor(author);
                 return RedirectToAction(nameof(Index));
             }
             return View(author);
         }
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
-            var author = await _db.Authors.FindAsync(id);
+            var author = _repository.GetAuthorById(id);
             if (author == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
             return View(author);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, Author author)
+        public IActionResult Edit(Author author)
         {
-            if (id != author.AuthorId)
-            {
-                return NotFound();
-            }
             if (ModelState.IsValid)
             {
-                _db.Authors.Update(author);
-                await _db.SaveChangesAsync();
+                _repository.UpdateAuthor(author);
                 return RedirectToAction(nameof(Index));
             }
             return View(author);
         }
 
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
-            var author = await _db.Authors.FindAsync(id);
+            var author = _repository.GetAuthorById(id);
             if (author == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
             return View(author);
         }
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
-            var author = await _db.Authors.FindAsync(id);
+            var author = _repository.GetAuthorById(id);
             if (author == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
             return View(author);
         }
         [HttpPost]
-        public async Task<IActionResult> Delete(int id, Author author)
+        public IActionResult Delete(Author author)
         {
-            if (id != author.AuthorId)
-            {
-                return NotFound();
-            }
-            _db.Authors.Remove(author);
-            await _db.SaveChangesAsync();
+            _repository.DeleteAuthor(author);
             return RedirectToAction(nameof(Index));
         }
     }

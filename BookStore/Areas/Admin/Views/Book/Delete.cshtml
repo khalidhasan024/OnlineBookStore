@@ -14,6 +14,7 @@
 <form method="post" asp-action="Delete">
     <div class="row p-4 border rounded">
         <input type="hidden" asp-for="BookId" />
+        <input type="hidden" asp-for="ImagePath" />
         <div class="col-7">
             <div class="row form-group">
                 <div class="col-3">
@@ -70,7 +71,7 @@
         </div>
         <br />
         <div class="form-group">
-            <input type="submit" asp-route-id="@Model.BookId" value="Delete" class="btn btn-sm btn-danger" />
+            <input type="submit" value="Delete" class="btn btn-sm btn-danger" />
             <a asp-action="Index" class="btn btn-sm btn-success">Back to List</a>
         </div>
     </div>

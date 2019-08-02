@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Data;
 using BookStore.Models;
+using BookStore.Models.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,13 +15,16 @@ namespace BookStore.Areas.Admin.Controllers
     public class BookCategoryController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public BookCategoryController(ApplicationDbContext db)
+        private readonly IBookRepository _repository;
+
+        public BookCategoryController(ApplicationDbContext db, IBookRepository repository)
         {
             _db = db;
+            _repository = repository;
         }
         public IActionResult Index()
         {
-            return View(_db.BookCategories.ToList());
+            return View(_repository.GetAllCategories());
         }
 
         public IActionResult Create()
@@ -30,87 +34,75 @@ namespace BookStore.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BookCategory category)
+        public IActionResult Create(BookCategory category)
         {
             if(ModelState.IsValid)
             {
-                _db.BookCategories.Add(category);
-                await _db.SaveChangesAsync();
+                _repository.AddCategory(category);
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
         }
 
-        public async Task<IActionResult> Edit(int id)
+        public IActionResult Edit(int? id)
         {
             if(id == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
-            var category = await _db.BookCategories.FindAsync(id);
+            var category = _repository.GetCategoryById(id);
             if(category == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
             return View(category);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, BookCategory category)
+        public IActionResult Edit(BookCategory category)
         {
-            if(id != category.Id)
-            {
-                return NotFound();
-            }
             if(ModelState.IsValid)
             {
-                _db.BookCategories.Update(category);
-                await _db.SaveChangesAsync();
+                _repository.UpdateCategory(category);
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
         }
 
-        public async Task<IActionResult> Details(int id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
-            var category = await _db.BookCategories.FindAsync(id);
+            var category = _repository.GetCategoryById(id);
             if (category == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
             return View(category);
         }
 
-        public async Task<IActionResult> Delete(int id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
-            var category = await _db.BookCategories.FindAsync(id);
+            var category = _repository.GetCategoryById(id);
             if (category == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
             return View(category);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, BookCategory category)
+        public IActionResult Delete(BookCategory category)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            
-            _db.BookCategories.Remove(category);
-            await _db.SaveChangesAsync();
+            _repository.DeleteCategory(category);
             return RedirectToAction(nameof(Index));
         }
     }

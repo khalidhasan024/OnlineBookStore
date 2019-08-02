@@ -18,7 +18,7 @@
             <div class="card-body">
                 <div class="mb-2">
                     <span class="lead font-weight-bold"> &#2547; @Book.Price</span>
-                    <a asp-action="Book" asp-route-id="@Book.BookId" class="btn btn-sm btn-success float-right">View Details</a>
+                    <a asp-controller="Book" asp-action="Details" asp-route-id="@Book.BookId" class="btn btn-sm btn-success float-right">View Details</a>
                 </div>
                 <div>
                     By:&nbsp; <a asp-action="Author" asp-route-id="@Book.Author.AuthorId">@(Book.Author?.Name)</a>

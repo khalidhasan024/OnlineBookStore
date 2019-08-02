@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Http;
 using BookStore.Models;
 using Microsoft.AspNetCore.Authorization;
+using BookStore.Models.Repositories;
 
 namespace BookStore.Areas.Admin.Controllers
 {
@@ -21,26 +22,28 @@ namespace BookStore.Areas.Admin.Controllers
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IBookRepository _repository;
         private readonly HostingEnvironment _hostingEnvironment;
 
 
         public BookViewModel ViewModel { get; set; }
-        public BookController(ApplicationDbContext db, HostingEnvironment host)
+        public BookController(ApplicationDbContext db, IBookRepository repository, HostingEnvironment host)
         {
             _db = db;
+            _repository = repository;
             _hostingEnvironment = host;
             ViewModel = new BookViewModel()
             {
                 Book = new Models.Book(),
-                Authors = _db.Authors.ToList(),
-                BookCategories = _db.BookCategories.ToList(),
-                Tags = _db.Tags.ToList()
+                Authors = _repository.GetAllAuthors(),
+                BookCategories = _repository.GetAllCategories()
+                //Tags = _db.Tags.ToList()
             };
         }
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var books = _db.Books.Include(b => b.Category).Include(b => b.Author).Include(b => b.BookTags);
-            return View(await books.ToListAsync());
+            var books = _repository.GetAllBooksWithDetails();
+            return View(books);
         }
 
         public IActionResult Create()
@@ -50,7 +53,7 @@ namespace BookStore.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BookViewModel model)
+        public IActionResult Create(BookViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -58,8 +61,9 @@ namespace BookStore.Areas.Admin.Controllers
                 return View(ViewModel);
             }
 
-            _db.Books.Add(model.Book);
-            await _db.SaveChangesAsync();
+            //_db.Books.Add(model.Book);
+            _repository.AddBook(model.Book);
+            //await _db.SaveChangesAsync();
 
             var RootDirectory = _hostingEnvironment.WebRootPath;
             var files = HttpContext.Request.Form.Files;
@@ -73,15 +77,16 @@ namespace BookStore.Areas.Admin.Controllers
                     files[0].CopyTo(fileStream);
                 }
 
-                model.Book.ImagePath = @"/images/books/" + model.Book.BookId + extension;
-
+                model.Book.ImagePath = DataContext.ImageSource + model.Book.BookId + extension;
+                
             }
             else
             {
-                _db.Attach(model.Book);
-                model.Book.ImagePath = @"/" + Path.Combine(DataContext.ImageDirectory + DataContext.DefaultImage);
+                //_db.Attach(model.Book);
+                model.Book.ImagePath = DataContext.ImageSource + DataContext.DefaultImage;
             }
-            await _db.SaveChangesAsync();
+            //await _db.SaveChangesAsync();
+            _repository.UpdateBook(model.Book);
             return RedirectToAction(nameof(Index));
         }
 
@@ -90,22 +95,22 @@ namespace BookStore.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            //Give this a name other than view model for example BookViewModel
-            BookViewModel model = new BookViewModel();
-
             if (id == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
 
-            var book = _db.Books.Include(b => b.Category)
+            /*var book = _db.Books.Include(b => b.Category)
                         .Include(b => b.Author)
-                        .SingleOrDefault(b => b.BookId == id);
+                        .SingleOrDefault(b => b.BookId == id);*/
+            var book = _repository.GetBookById(id);
 
             if (book == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
+
+            BookViewModel model = new BookViewModel();
 
             model.Book = book;
             model.Authors = _db.Authors.ToList();
@@ -116,22 +121,17 @@ namespace BookStore.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(BookViewModel model, int? id)
+        public IActionResult Edit(BookViewModel model)
         {
-            if (id == null || id != model.Book.BookId)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                var dbModel = _db.Books.Include(b => b.Category).Where(b => b.BookId == id).FirstOrDefault();
-
+                var book = model.Book;
                 var files = HttpContext.Request.Form.Files;
                 if (files.Any())
                 {
                     var RootDirectory = _hostingEnvironment.WebRootPath;
-                    var img = Path.Combine(RootDirectory, DataContext.ImageDirectory, Path.GetFileName(dbModel.ImagePath));
+                    var ext = Path.GetExtension(Path.GetFileName(book.ImagePath));
+                    var img = Path.Combine(RootDirectory, DataContext.ImageDirectory, book.BookId + ext);
 
                     if (System.IO.File.Exists(img))
                     {
@@ -145,55 +145,53 @@ namespace BookStore.Areas.Admin.Controllers
                         files[0].CopyTo(fileStream);
                     }
 
-                    dbModel.ImagePath = @"/images/books/" + model.Book.BookId + extension;
+                    book.ImagePath = DataContext.ImageSource + model.Book.BookId + extension;
                 }
+                book.AuthorId = model.Book.AuthorId;
+                book.CategoryId = model.Book.CategoryId;
+                book.Discount = model.Book.Discount;
+                book.Price = model.Book.Price;
+                book.Stock = model.Book.Stock;
+                book.Title = model.Book.Title;
 
-                dbModel.AuthorId = model.Book.AuthorId;
-                dbModel.CategoryId = model.Book.CategoryId;
-                dbModel.Discount = model.Book.Discount;
-                dbModel.Price = model.Book.Price;
-                dbModel.Stock = model.Book.Stock;
-                dbModel.Title = model.Book.Title;
-
-                //_db.Books.Update(dbModel);
-                await _db.SaveChangesAsync();
-
+                _repository.UpdateBook(book);
                 return RedirectToAction(nameof(Index));
-
             }
 
             return View(model);
 
         }
 
-        public async Task<IActionResult> Details(int? id)
+        
+        [HttpGet]
+        public IActionResult Details(int? id)
         {
             if(id == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
-            var book = await _db.Books.Include(b => b.Category).Include(b => b.Author)
-                        .Where(b => b.BookId == id).FirstOrDefaultAsync();
+            var book = _repository.GetBookWithDetails(id);
             if(book == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
 
             return View(book);
         }
 
 
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if(id == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
-            var book = await _db.Books.Include(b => b.Category).Include(b => b.Author)
-                        .Where(b => b.BookId == id).FirstOrDefaultAsync();
+            /*var book = await _db.Books.Include(b => b.Category).Include(b => b.Author)
+                        .Where(b => b.BookId == id).FirstOrDefaultAsync();*/
+            var book = _repository.GetBookById(id);
             if(book == null)
             {
-                return NotFound();
+                return View("~/Views/NotFound.cshtml");
             }
 
             return View(book);
@@ -201,26 +199,17 @@ namespace BookStore.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("Delete")]
-        public async Task<IActionResult> DeleteBook(int? id)
+        public IActionResult DeleteBook(Book book)
         {
-            if(id == null)
-            {
-                return NotFound();
-            }
-            var book = await _db.Books.SingleOrDefaultAsync(b => b.BookId == id);
-            if(book == null)
-            {
-                return NotFound();
-            }
             var RootDirectory = _hostingEnvironment.WebRootPath;
-            var img = Path.Combine(RootDirectory, DataContext.ImageDirectory, Path.GetFileName(book.ImagePath));
+            var extension = Path.GetExtension(Path.GetFileName(book.ImagePath));
+            var img = Path.Combine(RootDirectory, DataContext.ImageDirectory, book.BookId + extension);
 
             if (System.IO.File.Exists(img))
             {
                 System.IO.File.Delete(img);
             }
-            _db.Books.Remove(book);
-            await _db.SaveChangesAsync();
+            _repository.DeleteBook(book);
             return RedirectToAction(nameof(Index));
         }
 

@@ -13,6 +13,7 @@ using BookStore.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BookStore.Models.ViewModels;
+using BookStore.Models.Repositories;
 
 namespace BookStore
 {
@@ -40,6 +41,8 @@ namespace BookStore
             
             services.AddIdentity<IdentityUser, IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddTransient<IBookRepository, EfBookRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

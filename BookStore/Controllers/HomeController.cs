@@ -9,20 +9,24 @@ using BookStore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using BookStore.Models.ViewModels;
+using BookStore.Models.Repositories;
 
 namespace BookStore.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IBookRepository _repository;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
 
         public HomeController(ApplicationDbContext db,
+                            IBookRepository repository,
                             RoleManager<IdentityRole> roleManager,
                             UserManager<IdentityUser> userManager)
         {
             _db = db;
+            _repository = repository;
             _roleManager = roleManager;
             this._userManager = userManager;
         }
@@ -34,7 +38,7 @@ namespace BookStore.Controllers
             {
                 return RedirectToAction("New", "Order", new { area = "Admin" });
             }
-            var Books = _db.Books.Include(b => b.Category).Include(b => b.Author);
+            var Books = _repository.GetAllBooksWithDetails();
             return View(Books);
         }
 
